@@ -4,6 +4,10 @@ const cors = require("cors");
 const db = require("./db");
 const app = express();
 const port = process.env.PORT || 5775;
+
+app.set("view engine", "ejs");
+app.set("views", "view");
+app.use(express.static(__dirname + '/public'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -12,6 +16,11 @@ app.get("/status", (req, res) => {
     res.send(
         '{"kode":"01", "status":"API Berbasis ExpressJS OK"}'
     );
+})
+
+app.get("/", async (req, res) => {
+    const dtx = await db.getMetode();
+    res.render("beranda", {dtx: dtx});
 })
 
 app.listen(port, () => {
@@ -46,3 +55,15 @@ app.post("/backup", async (req, res) => {
     }
     return res.status(kodex).json(pesanx);
 })
+
+app.get("/backup/detail/:id", async (req, res) => {
+    const id = req.params.id;
+    const data = await db.getDetailBackup(id);
+    return res.status(200).json(data);
+});
+
+// Tambahkan route ini di app.js
+app.get("/api/backup", async (req, res) => {
+    const data = await db.getMetode();
+    return res.status(200).json(data);
+});
