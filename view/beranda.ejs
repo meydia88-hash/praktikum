@@ -166,8 +166,8 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sidebar-brand">
-    <h5><i class="bi bi-cloud-arrow-up-fill" style="color:#4fc3f7"></i> BackupManager</h5>
-    <small>Sistem Dashboard v1.0</small>
+    <h5><i class="bi bi-cloud-arrow-up-fill" style="color:#4fc3f7"></i> BackupData</h5>
+    <small>Sistem Dashboard</small>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-title">Menu Utama</div>
@@ -422,15 +422,15 @@
         let totalIncome = 0, totalExpense = 0;
         for (let t of data) {
           let nom = parseFloat(t.nominal) || 0;
-          let j = (t.jenis || '').toLowerCase();
-          if (j.includes('income') || j.includes('pemasukan')) totalIncome += nom;
+          let j = (t.jenis || '').trim();
+          if (j === '+' || j.toLowerCase().includes('income') || j.toLowerCase().includes('pemasukan')) totalIncome += nom;
           else totalExpense += nom;
         }
 
         const badgeJenis = j => {
-          let low = (j||'').toLowerCase();
-          if (low.includes('income') || low.includes('pemasukan')) return 'badge-income';
-          if (low.includes('expense') || low.includes('pengeluaran')) return 'badge-expense';
+          let v = (j||'').trim();
+          if (v === '+' || v.toLowerCase().includes('income') || v.toLowerCase().includes('pemasukan')) return 'badge-income';
+          if (v === '-' || v.toLowerCase().includes('expense') || v.toLowerCase().includes('pengeluaran')) return 'badge-expense';
           return 'badge-transfer';
         };
 
@@ -438,9 +438,9 @@
           <tr>
             <td><span style="color:#aab">${i+1}</span></td>
             <td><code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;font-size:0.74rem">${t.id || '—'}</code></td>
-            <td style="font-size:0.8rem;color:#6c7a8a">${fmtDatePlain(t.waktu)}</td>
-            <td>${t.deskripsi || '—'}</td>
-            <td><span class="badge-jenis ${badgeJenis(t.jenis)}">${t.jenis || '—'}</span></td>
+            <td style="font-size:0.8rem;color:#6c7a8a">${fmtDatePlain(t.tgl_jam)}</td>
+            <td>${t.uraian || '—'}</td>
+            <td><span class="badge-jenis ${badgeJenis(t.jenis)}">${t.jenis === '+' ? 'Pemasukan' : t.jenis === '-' ? 'Pengeluaran' : t.jenis || '—'}</span></td>
             <td style="text-align:right;font-weight:600;color:#1a3c5e">${fmt(t.nominal)}</td>
           </tr>`).join('');
 
