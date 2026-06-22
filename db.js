@@ -58,4 +58,25 @@ const tambahTransaksi = async (idx, id, waktux, nominalx, jenisx, deskripsix) =>
     }
 };
 
-module.exports = { getMetode, buatKoneksi, tambahBackup, tambahTransaksi, getDetailBackup };
+const registerUser = async (username, password, otp_secret) => {
+    const db = await buatKoneksi();
+    const sql = `INSERT INTO users (username, password, otp_secret) VALUES (?, ?, ?)`;
+    try {
+        await db.execute(sql, [username, password, otp_secret]);
+        await db.end();
+        return true;
+    } catch (err) {
+        await db.end();
+        throw err;
+    }
+};
+
+const getUserByUsername = async (username) => {
+    const db = await buatKoneksi();
+    const sql = `SELECT * FROM users WHERE username = ? LIMIT 1`;
+    const [rows] = await db.execute(sql, [username]);
+    await db.end();
+    return rows.length > 0 ? rows[0] : null;
+};
+
+module.exports = { getMetode, buatKoneksi, tambahBackup, tambahTransaksi, getDetailBackup, registerUser, getUserByUsername };

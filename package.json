@@ -17,11 +17,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
-    "mysql2": "^3.22.4"
+    "express-session": "^1.19.0",
+    "mysql2": "^3.22.4",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0"
   }
 }

@@ -1,7 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const session = require("express-session");
 const db = require("./db");
+const authRoutes = require("./routes/auth");
 const app = express();
 const port = process.env.PORT || 5775;
 
@@ -11,6 +13,24 @@ app.use(express.static(__dirname + '/public'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use("/", authRoutes);
+
+function requireLogin(req, res, next) {
+    if (req.session.user) return next();
+    res.redirect("/login");
+}
+
+app.get("/", requireLogin, async (req, res) => {
+    const dtx = await db.getMetode();
+    res.render("beranda", { dtx: dtx, user: req.session.user });
+})
 
 app.get("/status", (req, res) => {
     res.send(

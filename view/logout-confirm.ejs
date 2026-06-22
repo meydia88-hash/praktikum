@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout — API Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ===== LANGIT ===== */
+        .sky {
+            position: fixed; inset: 0;
+            background: linear-gradient(
+                180deg,
+                #0a1628 0%, #0d2347 15%, #0e3a6e 35%,
+                #1565c0 55%, #42a5f5 75%, #87ceeb 88%, #e0f4ff 100%
+            );
+            z-index: 0;
+        }
+
+        .stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star {
+            position: absolute; background: #fff; border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite; opacity: 0;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity:0; transform:scale(0.8); }
+            50%      { opacity:var(--op); transform:scale(1); }
+        }
+
+        .clouds { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+        .cloud {
+            position: absolute; background: rgba(255,255,255,0.92);
+            border-radius: 50px; filter: blur(1px);
+            animation: floatCloud var(--spd) linear infinite;
+        }
+        .cloud::before, .cloud::after {
+            content: ''; position: absolute;
+            background: rgba(255,255,255,0.92); border-radius: 50%;
+        }
+        .cloud-1 { width:140px; height:40px; top:62%; --spd:35s; left:-160px; opacity:0.85; }
+        .cloud-1::before { width:70px; height:55px; top:-30px; left:18px; }
+        .cloud-1::after  { width:55px; height:45px; top:-22px; left:60px; }
+        .cloud-2 { width:100px; height:30px; top:68%; --spd:50s; left:-120px; opacity:0.7; animation-delay:-18s; }
+        .cloud-2::before { width:50px; height:40px; top:-22px; left:12px; }
+        .cloud-2::after  { width:40px; height:33px; top:-16px; left:44px; }
+        .cloud-3 { width:180px; height:48px; top:72%; --spd:42s; left:-200px; opacity:0.8; animation-delay:-8s; }
+        .cloud-3::before { width:88px; height:68px; top:-38px; left:22px; }
+        .cloud-3::after  { width:70px; height:55px; top:-28px; left:80px; }
+        .cloud-4 { width:120px; height:34px; top:78%; --spd:60s; left:-140px; opacity:0.6; animation-delay:-30s; }
+        .cloud-4::before { width:58px; height:46px; top:-26px; left:14px; }
+        .cloud-4::after  { width:48px; height:38px; top:-19px; left:52px; }
+        @keyframes floatCloud {
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(100vw + 300px)); }
+        }
+
+        .sunlight {
+            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 300px;
+            background: radial-gradient(ellipse at center bottom,
+                rgba(255,200,80,0.22) 0%, rgba(255,160,50,0.10) 40%, transparent 70%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* ===== KONTEN ===== */
+        .auth-logo {
+            position: relative; z-index: 10;
+            text-align: center; margin-bottom: 1.5rem;
+        }
+
+        .auth-logo .icon-wrap {
+            width: 78px; height: 78px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 0.75rem;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 24px rgba(135,206,235,0.3);
+        }
+        .auth-logo .icon-wrap i { font-size: 1.9rem; color: #fff; }
+        .auth-logo h4 {
+            color: #fff; font-weight: 700; font-size: 1.5rem;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.3); margin-bottom: 0.2rem;
+        }
+        .auth-logo p {
+            color: rgba(255,255,255,0.75); font-size: 0.85rem;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+        }
+
+        .logout-card {
+            position: relative; z-index: 10;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 20px;
+            padding: 2.25rem 2rem;
+            box-shadow: 0 8px 32px rgba(14,58,110,0.18), 0 1px 0 rgba(255,255,255,0.6) inset;
+            width: 100%; max-width: 400px;
+            text-align: center;
+            animation: cardDrop 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes cardDrop {
+            from { opacity:0; transform:translateY(24px) scale(0.97); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+
+        .icon-logout-wrap {
+            width: 76px; height: 76px;
+            background: rgba(254,242,242,0.9);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.25rem;
+            border: 2px solid #fecaca;
+        }
+        .icon-logout-wrap i { font-size: 2rem; color: #e53e3e; }
+
+        .logout-card h5 {
+            font-weight: 700; color: #0d2347;
+            font-size: 1.2rem; margin-bottom: 0.3rem;
+        }
+
+        .sub {
+            color: #6c7a8a; font-size: 0.875rem; margin-bottom: 1rem;
+        }
+
+        .user-badge {
+            display: inline-flex; align-items: center; gap: 0.45rem;
+            background: #e3f2fd; color: #1565c0;
+            font-size: 0.82rem; font-weight: 700;
+            padding: 0.35rem 1rem; border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .divider {
+            height: 1px; background: #d8eaf7; margin: 0 0 1.5rem;
+        }
+
+        .warning-box {
+            display: flex; align-items: flex-start; gap: 0.55rem;
+            background: rgba(255,251,235,0.9);
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-size: 0.83rem; color: #92400e;
+            text-align: left;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            overflow-wrap: break-word;
+        }
+        .warning-box i { color: #d97706; margin-top: 3px; flex-shrink: 0; }
+
+        .btn-logout {
+            display: block; width: 100%; height: 48px;
+            background: linear-gradient(135deg, #e53e3e 0%, #dd6b20 100%);
+            border: none; border-radius: 10px;
+            color: #fff; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(229,62,62,0.35);
+            text-decoration: none; line-height: 48px;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(229,62,62,0.5);
+            color: #fff; text-decoration: none;
+        }
+
+        .btn-cancel {
+            display: block; width: 100%; height: 44px;
+            background: rgba(247,249,252,0.9);
+            border: 1.5px solid #c8dff0;
+            border-radius: 10px;
+            color: #3a5068; font-weight: 600; font-size: 0.875rem;
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none; line-height: 44px;
+        }
+        .btn-cancel:hover {
+            background: #e3f2fd; color: #1565c0;
+            border-color: #90caf9; text-decoration: none;
+        }
+
+        .security-note {
+            display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+            font-size: 0.76rem; color: #90b4ce; margin-top: 1.25rem;
+        }
+        .security-note i { color: #42a5f5; }
+
+        .footer-note {
+            position: relative; z-index: 10;
+            color: rgba(255,255,255,0.5); font-size: 0.75rem;
+            text-align: center; margin-top: 1.25rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sky"></div>
+    <div class="stars" id="stars"></div>
+    <div class="clouds">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+    </div>
+    <div class="sunlight"></div>
+
+    <!-- Logo -->
+    <div class="auth-logo">
+        <div class="icon-wrap">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+        <h4>API Express</h4>
+        <p>Sistem Login Aman dengan 2FA</p>
+    </div>
+
+    <!-- Card -->
+    <div class="logout-card">
+
+        <div class="icon-logout-wrap">
+            <i class="fas fa-right-from-bracket"></i>
+        </div>
+
+        <h5>Keluar dari Akun?</h5>
+        <p class="sub">Anda sedang login sebagai</p>
+
+        <div class="user-badge">
+            <i class="fas fa-user-circle"></i>
+            <%= user.username %>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="warning-box">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span>
+                Sesi Anda akan diakhiri. Untuk masuk kembali, Anda perlu memasukkan
+                <strong>username</strong>, <strong>password</strong>, dan
+                <strong>kode OTP</strong> dari Google Authenticator.
+            </span>
+        </div>
+
+        <a href="/logout" class="btn-logout">
+            <i class="fas fa-right-from-bracket"></i>&nbsp; Ya, Keluar Sekarang
+        </a>
+
+        <a href="/" class="btn-cancel">
+            <i class="fas fa-arrow-left"></i>&nbsp; Batal, Kembali ke Dashboard
+        </a>
+
+        <div class="security-note">
+            <i class="fas fa-shield-halved"></i>
+            Dilindungi sistem autentikasi 2FA
+        </div>
+
+    </div>
+
+
+<script>
+(function() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() * 2.5 + 0.5;
+        s.style.cssText = `
+            width:${size}px; height:${size}px;
+            top:${Math.random() * 55}%;
+            left:${Math.random() * 100}%;
+            --dur:${Math.random() * 3 + 2}s;
+            --op:${Math.random() * 0.7 + 0.3};
+            animation-delay:${Math.random() * 4}s;
+        `;
+        container.appendChild(s);
+    }
+})();
+</script>
+
+</body>
+</html>

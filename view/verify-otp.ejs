@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi OTP — API Express</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .sky {
+            position: fixed; inset: 0;
+            background: linear-gradient(
+                180deg,
+                #0a1628 0%, #0d2347 15%, #0e3a6e 35%,
+                #1565c0 55%, #42a5f5 75%, #87ceeb 88%, #e0f4ff 100%
+            );
+            z-index: 0;
+        }
+
+        .stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .star {
+            position: absolute; background: #fff; border-radius: 50%;
+            animation: twinkle var(--dur) ease-in-out infinite; opacity: 0;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity:0; transform:scale(0.8); }
+            50%      { opacity:var(--op); transform:scale(1); }
+        }
+
+        .clouds { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+        .cloud {
+            position: absolute; background: rgba(255,255,255,0.92);
+            border-radius: 50px; filter: blur(1px);
+            animation: floatCloud var(--spd) linear infinite;
+        }
+        .cloud::before, .cloud::after {
+            content: ''; position: absolute;
+            background: rgba(255,255,255,0.92); border-radius: 50%;
+        }
+        .cloud-1 { width:140px; height:40px; top:62%; --spd:35s; left:-160px; opacity:0.85; }
+        .cloud-1::before { width:70px; height:55px; top:-30px; left:18px; }
+        .cloud-1::after  { width:55px; height:45px; top:-22px; left:60px; }
+        .cloud-2 { width:100px; height:30px; top:68%; --spd:50s; left:-120px; opacity:0.7; animation-delay:-18s; }
+        .cloud-2::before { width:50px; height:40px; top:-22px; left:12px; }
+        .cloud-2::after  { width:40px; height:33px; top:-16px; left:44px; }
+        .cloud-3 { width:180px; height:48px; top:72%; --spd:42s; left:-200px; opacity:0.8; animation-delay:-8s; }
+        .cloud-3::before { width:88px; height:68px; top:-38px; left:22px; }
+        .cloud-3::after  { width:70px; height:55px; top:-28px; left:80px; }
+        .cloud-4 { width:120px; height:34px; top:78%; --spd:60s; left:-140px; opacity:0.6; animation-delay:-30s; }
+        .cloud-4::before { width:58px; height:46px; top:-26px; left:14px; }
+        .cloud-4::after  { width:48px; height:38px; top:-19px; left:52px; }
+        @keyframes floatCloud {
+            from { transform: translateX(0); }
+            to   { transform: translateX(calc(100vw + 300px)); }
+        }
+
+        .sunlight {
+            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 300px;
+            background: radial-gradient(ellipse at center bottom,
+                rgba(255,200,80,0.22) 0%, rgba(255,160,50,0.10) 40%, transparent 70%);
+            z-index: 2; pointer-events: none;
+        }
+
+        /* ===== KONTEN ===== */
+        .auth-logo {
+            position: relative; z-index: 10;
+            text-align: center; margin-bottom: 1.5rem;
+        }
+
+        .auth-logo .icon-wrap {
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 0.75rem;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            backdrop-filter: blur(8px);
+            animation: iconPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes iconPulse {
+            0%,100% { box-shadow: 0 0 0 0 rgba(135,206,235,0.4); }
+            50%      { box-shadow: 0 0 0 14px rgba(135,206,235,0); }
+        }
+        .auth-logo .icon-wrap i { font-size: 2rem; color: #fff; }
+        .auth-logo h4 {
+            color: #fff; font-weight: 700; font-size: 1.5rem;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.3); margin-bottom: 0.2rem;
+        }
+        .auth-logo p {
+            color: rgba(255,255,255,0.75); font-size: 0.85rem;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.2);
+        }
+
+        .auth-card {
+            position: relative; z-index: 10;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.7);
+            border-radius: 20px;
+            padding: 2.25rem 2rem;
+            box-shadow: 0 8px 32px rgba(14,58,110,0.18), 0 1px 0 rgba(255,255,255,0.6) inset;
+            width: 100%; max-width: 460px;
+            animation: cardDrop 0.5s cubic-bezier(0.22,1,0.36,1);
+        }
+        @keyframes cardDrop {
+            from { opacity:0; transform:translateY(24px) scale(0.97); }
+            to   { opacity:1; transform:translateY(0) scale(1); }
+        }
+
+        .step-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            background: #e3f2fd; color: #1565c0;
+            font-size: 0.72rem; font-weight: 700;
+            padding: 0.25rem 0.8rem; border-radius: 20px; margin-bottom: 0.9rem;
+        }
+
+        .auth-card h5 { font-weight: 700; color: #0d2347; font-size: 1.2rem; margin-bottom: 0.2rem; }
+        .auth-card .subtitle { color: #6c7a8a; font-size: 0.84rem; margin-bottom: 1.5rem; }
+
+        .info-box {
+            display: flex; align-items: flex-start; gap: 0.6rem;
+            background: rgba(227,242,253,0.7);
+            border: 1px solid #bee3f8;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            font-size: 0.84rem; color: #2c5282;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            word-break: normal;
+            overflow-wrap: break-word;
+        }
+        .info-box i { color: #1565c0; margin-top: 3px; flex-shrink: 0; font-size: 0.95rem; }
+
+        .otp-label {
+            display: block; font-size: 0.74rem; font-weight: 700;
+            color: #3a5068; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .otp-inputs {
+            display: flex; gap: 0.6rem;
+            justify-content: center; margin-bottom: 0.5rem;
+        }
+
+        .otp-digit {
+            width: 54px; height: 62px;
+            text-align: center;
+            font-size: 1.6rem; font-weight: 700; color: #0d2347;
+            border: 2px solid #c8dff0;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.85);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            caret-color: transparent;
+        }
+        .otp-digit:focus {
+            border-color: #42a5f5;
+            box-shadow: 0 0 0 3px rgba(66,165,245,0.2);
+            background: #fff;
+        }
+        .otp-digit.filled {
+            border-color: #1565c0;
+            background: rgba(227,242,253,0.6);
+        }
+
+        .timer-section {
+            text-align: center; margin: 1rem 0 0.25rem;
+            font-size: 0.82rem; color: #6c8ea4;
+        }
+        .timer-bar-wrap {
+            background: #d8eaf7; border-radius: 10px;
+            height: 6px; margin: 0.5rem 0; overflow: hidden;
+        }
+        .timer-bar {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, #1565c0, #42a5f5);
+            transition: width 1s linear;
+        }
+        .timer-display { font-size: 1.1rem; font-weight: 700; color: #1565c0; }
+
+        .btn-verify {
+            display: block; width: 100%; height: 48px;
+            background: linear-gradient(135deg, #1565c0 0%, #42a5f5 100%);
+            border: none; border-radius: 10px;
+            color: #fff; font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 16px rgba(21,101,192,0.4);
+            margin-top: 1.25rem; letter-spacing: 0.3px;
+        }
+        .btn-verify:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(21,101,192,0.5);
+        }
+        .btn-verify:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .alert-error {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: #fff5f5; color: #c53030;
+            border: 1px solid #fed7d7;
+            border-radius: 10px; padding: 0.7rem 1rem;
+            font-size: 0.84rem; margin-bottom: 1rem;
+        }
+
+        .back-link { text-align: center; margin-top: 1.25rem; font-size: 0.875rem; }
+        .back-link a { color: #6c8ea4; text-decoration: none; transition: color 0.2s; }
+        .back-link a:hover { color: #1565c0; }
+
+        .footer-note {
+            position: relative; z-index: 10;
+            color: rgba(255,255,255,0.5); font-size: 0.75rem;
+            text-align: center; margin-top: 1.25rem;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sky"></div>
+    <div class="stars" id="stars"></div>
+    <div class="clouds">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="cloud cloud-4"></div>
+    </div>
+    <div class="sunlight"></div>
+
+    <div class="auth-logo">
+        <div class="icon-wrap">
+            <i class="fas fa-mobile-screen-button"></i>
+        </div>
+        <h4>Verifikasi 2FA</h4>
+        <p>Masukkan kode dari Google Authenticator</p>
+    </div>
+
+    <div class="auth-card">
+
+        <div class="step-badge">
+            <i class="fas fa-circle-2"></i> Langkah 2 dari 2
+        </div>
+
+        <h5>Kode Autentikasi</h5>
+        <p class="subtitle">Buka Google Authenticator di HP Anda</p>
+
+        <% if (error) { %>
+        <div class="alert-error">
+            <i class="fas fa-circle-exclamation"></i> <%= error %>
+        </div>
+        <% } %>
+
+        <div class="info-box">
+            <i class="fas fa-shield-halved"></i>
+            <span>
+                Buka <strong>Google Authenticator</strong> di HP Anda, cari akun
+                <strong>API Express</strong>, lalu masukkan kode <strong>6 digit</strong>
+                yang tampil ke kolom di bawah.
+            </span>
+        </div>
+
+        <form method="POST" action="/verify-otp" id="otpForm">
+            <input type="hidden" name="token" id="tokenInput">
+
+            <span class="otp-label">Masukkan kode 6 digit</span>
+
+            <div class="otp-inputs">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            </div>
+
+            <div class="timer-section">
+                <div class="timer-bar-wrap">
+                    <div class="timer-bar" id="timerBar" style="width:100%"></div>
+                </div>
+                <span>Kode berlaku: </span>
+                <span class="timer-display" id="timerText">30</span>
+                <span> detik</span>
+            </div>
+
+            <button type="submit" class="btn-verify" id="verifyBtn" disabled>
+                <i class="fas fa-check-double"></i>&nbsp; Verifikasi Kode
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/login">
+                <i class="fas fa-arrow-left"></i> Kembali ke halaman login
+            </a>
+        </div>
+
+    </div>
+
+
+<script>
+(function() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = Math.random() * 2.5 + 0.5;
+        s.style.cssText = `
+            width:${size}px; height:${size}px;
+            top:${Math.random() * 55}%;
+            left:${Math.random() * 100}%;
+            --dur:${Math.random() * 3 + 2}s;
+            --op:${Math.random() * 0.7 + 0.3};
+            animation-delay:${Math.random() * 4}s;
+        `;
+        container.appendChild(s);
+    }
+})();
+
+const boxes      = document.querySelectorAll('.otp-digit');
+const tokenInput = document.getElementById('tokenInput');
+const verifyBtn  = document.getElementById('verifyBtn');
+
+boxes.forEach((box, idx) => {
+    box.addEventListener('input', () => {
+        box.value = box.value.replace(/[^0-9]/g, '');
+        if (box.value && idx < boxes.length - 1) boxes[idx + 1].focus();
+        box.classList.toggle('filled', !!box.value);
+        updateToken();
+    });
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && idx > 0) {
+            boxes[idx - 1].value = '';
+            boxes[idx - 1].classList.remove('filled');
+            boxes[idx - 1].focus();
+            updateToken();
+        }
+    });
+    box.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData)
+            .getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+        pasted.split('').forEach((ch, i) => {
+            if (boxes[i]) { boxes[i].value = ch; boxes[i].classList.add('filled'); }
+        });
+        if (boxes[pasted.length - 1]) boxes[pasted.length - 1].focus();
+        updateToken();
+    });
+});
+
+function updateToken() {
+    const code = [...boxes].map(b => b.value).join('');
+    tokenInput.value = code;
+    verifyBtn.disabled = code.length < 6;
+    if (code.length === 6) {
+        setTimeout(() => document.getElementById('otpForm').submit(), 300);
+    }
+}
+
+boxes[0].focus();
+
+function startTimer() {
+    const bar  = document.getElementById('timerBar');
+    const text = document.getElementById('timerText');
+    function tick() {
+        const now       = Math.floor(Date.now() / 1000);
+        const remaining = 30 - (now % 30);
+        const pct       = (remaining / 30) * 100;
+        text.textContent = remaining;
+        bar.style.width  = pct + '%';
+        if (remaining <= 5) {
+            bar.style.background = 'linear-gradient(90deg, #e53e3e, #fc8181)';
+            text.style.color     = '#e53e3e';
+        } else if (remaining <= 10) {
+            bar.style.background = 'linear-gradient(90deg, #dd6b20, #f6ad55)';
+            text.style.color     = '#dd6b20';
+        } else {
+            bar.style.background = 'linear-gradient(90deg, #1565c0, #42a5f5)';
+            text.style.color     = '#1565c0';
+        }
+    }
+    tick();
+    setInterval(tick, 1000);
+}
+
+startTimer();
+</script>
+
+</body>
+</html>

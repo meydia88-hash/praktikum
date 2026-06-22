@@ -3,53 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Backup</title>
+  <title>Dashboard Backup — Tema Langit</title>
   <link href="https://cdn.jsdelivr.net/npm/@coreui/coreui@5.3.1/dist/css/coreui.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <style>
-    :root { --sidebar-width: 250px; }
-    body { background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; margin: 0; }
+    :root {
+      --sidebar-width: 250px;
+      --sky-50:  #f0f9ff;
+      --sky-100: #e0f2fe;
+      --sky-200: #bae6fd;
+      --sky-300: #7dd3fc;
+      --sky-500: #0ea5e9;
+      --sky-600: #0284c7;
+      --sky-700: #0369a1;
+      --sky-900: #0c4a6e;
+      --sun-300: #fde68a;
+      --sun-400: #fbbf24;
+      --sun-600: #d97706;
+      --dusk-600: #6d5bb3;
+      --dusk-700: #4c3a91;
+      --cloud: #ffffff;
+      --ink: #0c2d48;
+      --muted: #5b7896;
+    }
+    body {
+      background: linear-gradient(180deg, #eaf6ff 0%, #f5fbff 45%, #fbfdff 100%);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      position: relative;
+      min-height: 100vh;
+    }
+    /* Awan dekoratif lembut di belakang halaman */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(60px 28px at 12% 8%, rgba(255,255,255,0.9), rgba(255,255,255,0) 70%),
+        radial-gradient(80px 34px at 18% 10%, rgba(255,255,255,0.85), rgba(255,255,255,0) 70%),
+        radial-gradient(50px 24px at 78% 6%, rgba(255,255,255,0.8), rgba(255,255,255,0) 70%),
+        radial-gradient(70px 30px at 85% 9%, rgba(255,255,255,0.75), rgba(255,255,255,0) 70%),
+        radial-gradient(55px 26px at 50% 4%, rgba(255,255,255,0.7), rgba(255,255,255,0) 70%);
+      opacity: 0.7;
+    }
     .sidebar {
       width: var(--sidebar-width); min-height: 100vh;
-      background: linear-gradient(180deg, #1a3c5e 0%, #0d2137 100%);
+      background: linear-gradient(180deg, #2eb6e8 0%, #1573a8 55%, #0c3a5e 100%);
       position: fixed; top: 0; left: 0; z-index: 1000;
       display: flex; flex-direction: column;
+      box-shadow: 2px 0 18px rgba(12,58,94,0.18);
     }
-    .sidebar-brand { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-brand { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.15); }
     .sidebar-brand h5 { color: #fff; margin: 0; font-weight: 700; font-size: 1rem; }
-    .sidebar-brand small { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+    .sidebar-brand small { color: rgba(255,255,255,0.65); font-size: 0.75rem; }
     .sidebar-nav { padding: 16px 0; flex: 1; }
     .sidebar-nav a {
       display: flex; align-items: center; gap: 10px;
-      padding: 10px 24px; color: rgba(255,255,255,0.65);
+      padding: 10px 24px; color: rgba(255,255,255,0.75);
       text-decoration: none; font-size: 0.875rem;
       border-left: 3px solid transparent; transition: all 0.2s;
     }
     .sidebar-nav a:hover, .sidebar-nav a.active {
-      color: #fff; background: rgba(255,255,255,0.07); border-left-color: #4fc3f7;
+      color: #fff; background: rgba(255,255,255,0.12); border-left-color: var(--sun-400);
     }
     .sidebar-nav .nav-title {
-      padding: 16px 24px 4px; color: rgba(255,255,255,0.35);
+      padding: 16px 24px 4px; color: rgba(255,255,255,0.5);
       font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
     }
-    .main-wrapper { margin-left: var(--sidebar-width); min-height: 100vh; display: flex; flex-direction: column; }
+    .main-wrapper { margin-left: var(--sidebar-width); min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
     .topbar {
-      background: #fff; padding: 14px 28px; border-bottom: 1px solid #e4e9f0;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(6px);
+      padding: 14px 28px; border-bottom: 1px solid var(--sky-100);
       display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(14,165,233,0.08);
     }
-    .topbar h4 { margin: 0; color: #1a3c5e; font-size: 1.1rem; font-weight: 700; }
+    .topbar h4 { margin: 0; color: var(--sky-900); font-size: 1.1rem; font-weight: 700; }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     .badge-live {
-      background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 20px;
+      background: var(--sky-100); color: var(--sky-700); padding: 4px 10px; border-radius: 20px;
       font-size: 0.72rem; font-weight: 600; display: flex; align-items: center; gap: 5px;
     }
     .badge-live::before {
       content: ''; display: inline-block; width: 7px; height: 7px;
-      border-radius: 50%; background: #43a047; animation: pulse 1.5s infinite;
+      border-radius: 50%; background: var(--sky-500); animation: pulse 1.5s infinite;
     }
     .refresh-info {
-      font-size: 0.72rem; color: #6c7a8a;
+      font-size: 0.72rem; color: var(--muted);
       display: flex; align-items: center; gap: 5px;
     }
     .refresh-info i { font-size: 0.8rem; }
@@ -59,104 +100,106 @@
     @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
     .content { padding: 28px; flex: 1; }
     .stat-card {
-      background: #fff; border-radius: 12px; padding: 22px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      background: var(--cloud); border-radius: 14px; padding: 22px;
+      box-shadow: 0 4px 16px rgba(14,165,233,0.10);
       display: flex; align-items: center; gap: 18px;
       transition: transform 0.2s, box-shadow 0.2s;
       animation: fadeIn 0.3s ease;
+      border: 1px solid var(--sky-100);
     }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(14,165,233,0.16); }
     .stat-icon {
-      width: 54px; height: 54px; border-radius: 12px;
+      width: 54px; height: 54px; border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; flex-shrink: 0;
     }
-    .stat-icon.blue   { background: #e3f2fd; color: #1565c0; }
-    .stat-icon.green  { background: #e8f5e9; color: #2e7d32; }
-    .stat-icon.orange { background: #fff3e0; color: #e65100; }
-    .stat-icon.purple { background: #f3e5f5; color: #6a1b9a; }
-    .stat-info h3 { margin: 0 0 2px; font-size: 1.6rem; font-weight: 700; color: #1a3c5e; transition: all 0.3s; }
-    .stat-info p  { margin: 0; font-size: 0.78rem; color: #6c7a8a; font-weight: 500; }
+    .stat-icon.blue   { background: var(--sky-100); color: var(--sky-600); }
+    .stat-icon.green  { background: #fff7e0; color: var(--sun-600); }
+    .stat-icon.orange { background: #e6fbff; color: #0e8aa3; }
+    .stat-icon.purple { background: #efeaff; color: var(--dusk-700); }
+    .stat-info h3 { margin: 0 0 2px; font-size: 1.6rem; font-weight: 700; color: var(--sky-900); transition: all 0.3s; }
+    .stat-info p  { margin: 0; font-size: 0.78rem; color: var(--muted); font-weight: 500; }
     .card-section {
-      background: #fff; border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06); overflow: hidden; margin-top: 28px;
+      background: var(--cloud); border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(14,165,233,0.10); overflow: hidden; margin-top: 28px;
+      border: 1px solid var(--sky-100);
     }
     .card-section-header {
-      padding: 18px 24px; border-bottom: 1px solid #f0f4f8;
+      padding: 18px 24px; border-bottom: 1px solid var(--sky-50);
       display: flex; align-items: center; justify-content: space-between;
     }
-    .card-section-header h5 { margin: 0; font-size: 0.95rem; font-weight: 700; color: #1a3c5e; }
+    .card-section-header h5 { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--sky-900); }
     .table-backup { width: 100%; border-collapse: collapse; }
     .table-backup thead th {
-      background: #f7f9fc; padding: 11px 16px; font-size: 0.72rem;
+      background: var(--sky-50); padding: 11px 16px; font-size: 0.72rem;
       font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px;
-      color: #6c7a8a; border-bottom: 1px solid #e4e9f0; white-space: nowrap;
+      color: var(--muted); border-bottom: 1px solid var(--sky-100); white-space: nowrap;
     }
     .table-backup tbody td {
-      padding: 13px 16px; font-size: 0.85rem; color: #2d3a4a;
-      border-bottom: 1px solid #f5f7fa; vertical-align: middle;
+      padding: 13px 16px; font-size: 0.85rem; color: var(--ink);
+      border-bottom: 1px solid var(--sky-50); vertical-align: middle;
     }
     .table-backup tbody tr:last-child td { border-bottom: none; }
-    .table-backup tbody tr:hover { background: #f9fbfe; }
+    .table-backup tbody tr:hover { background: var(--sky-50); }
     .table-backup tbody tr { animation: fadeIn 0.3s ease; }
     .badge-channel { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
-    .badge-nodejs  { background: #e8f5e9; color: #2e7d32; }
-    .badge-php     { background: #e3f2fd; color: #1565c0; }
-    .badge-laravel { background: #fce4ec; color: #c62828; }
-    .badge-python  { background: #fff3e0; color: #e65100; }
+    .badge-nodejs  { background: #e3fbf5; color: #0d8f6e; }
+    .badge-php     { background: var(--sky-100); color: var(--sky-700); }
+    .badge-laravel { background: #ffe9ee; color: #c2185b; }
+    .badge-python  { background: var(--sun-300); color: var(--sun-600); }
     .btn-detail {
-      padding: 5px 14px; background: #e3f2fd; color: #1565c0;
+      padding: 5px 14px; background: var(--sky-100); color: var(--sky-700);
       border: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600;
       cursor: pointer; transition: background 0.2s;
       display: inline-flex; align-items: center; gap: 4px;
     }
-    .btn-detail:hover { background: #bbdefb; color: #0d47a1; }
+    .btn-detail:hover { background: var(--sky-200); color: var(--sky-900); }
     .modal-overlay {
       display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45); z-index: 2000;
+      background: rgba(12,58,94,0.45); z-index: 2000;
       justify-content: center; align-items: center;
     }
     .modal-overlay.show { display: flex; }
     .modal-box {
-      background: #fff; border-radius: 16px; width: 90%; max-width: 820px;
+      background: var(--cloud); border-radius: 18px; width: 90%; max-width: 820px;
       max-height: 88vh; display: flex; flex-direction: column;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden;
+      box-shadow: 0 24px 64px rgba(12,58,94,0.28); overflow: hidden;
       animation: fadeIn 0.2s ease;
     }
     .modal-header {
-      padding: 20px 24px; background: linear-gradient(90deg, #1a3c5e, #2563a8);
+      padding: 20px 24px; background: linear-gradient(90deg, #1573a8, #2eb6e8);
       color: #fff; display: flex; align-items: center; justify-content: space-between;
     }
     .modal-header h5 { margin: 0; font-size: 1rem; font-weight: 700; }
-    .modal-header small { opacity: 0.7; font-size: 0.78rem; }
+    .modal-header small { opacity: 0.85; font-size: 0.78rem; }
     .modal-close {
-      background: rgba(255,255,255,0.15); border: none; color: #fff;
+      background: rgba(255,255,255,0.2); border: none; color: #fff;
       width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
     }
     .modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
     .modal-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 18px; }
-    .modal-stat-card { background: #f7f9fc; border-radius: 10px; padding: 14px; text-align: center; }
-    .modal-stat-card .val { font-size: 1.3rem; font-weight: 700; color: #1a3c5e; }
-    .modal-stat-card .lbl { font-size: 0.72rem; color: #6c7a8a; margin-top: 2px; }
+    .modal-stat-card { background: var(--sky-50); border-radius: 12px; padding: 14px; text-align: center; }
+    .modal-stat-card .val { font-size: 1.3rem; font-weight: 700; color: var(--sky-900); }
+    .modal-stat-card .lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
     .badge-jenis { padding: 3px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; }
-    .badge-income   { background: #e8f5e9; color: #2e7d32; }
-    .badge-expense  { background: #fce4ec; color: #c62828; }
-    .badge-transfer { background: #fff3e0; color: #e65100; }
-    .empty-state { text-align: center; padding: 40px 20px; color: #aab; font-size: 0.9rem; }
+    .badge-income   { background: #e3fbf5; color: #0d8f6e; }
+    .badge-expense  { background: #ffe9ee; color: #c2185b; }
+    .badge-transfer { background: var(--sun-300); color: var(--sun-600); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--sky-300); font-size: 0.9rem; }
     .empty-state i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-    .loading-state { text-align: center; padding: 30px 20px; color: #6c7a8a; }
+    .loading-state { text-align: center; padding: 30px 20px; color: var(--muted); }
     .countdown-bar {
-      height: 3px; background: #e3f2fd;
+      height: 3px; background: var(--sky-100);
       position: relative; overflow: hidden;
     }
     .countdown-bar-fill {
-      height: 100%; background: #1565c0;
+      height: 100%; background: var(--sky-500);
       transition: width 1s linear;
     }
     .new-row { animation: highlight 1.5s ease; }
     @keyframes highlight {
-      0%   { background: #e3f2fd; }
+      0%   { background: var(--sky-100); }
       100% { background: transparent; }
     }
   </style>
@@ -166,13 +209,17 @@
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sidebar-brand">
-    <h5><i class="bi bi-cloud-arrow-up-fill" style="color:#4fc3f7"></i> BackupData</h5>
+    <h5><i class="bi bi-cloud-arrow-up-fill" style="color:#fde68a"></i> BackupData</h5>
     <small>Sistem Dashboard</small>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-title">Menu Utama</div>
     <a href="/" class="active">
       <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+    <div class="nav-title">Akun</div>
+    <a href="/logout-confirm" style="color:rgba(255,180,180,0.9);">
+      <i class="bi bi-box-arrow-right"></i> Logout
     </a>
   </nav>
 </div>
@@ -187,6 +234,42 @@
         Refresh dalam <span id="countdown">10</span>s
       </span>
       <div class="badge-live">Live Data</div>
+      <!-- Tombol user + logout -->
+      <div style="position:relative;" id="userMenuWrap">
+        <button onclick="toggleUserMenu()" style="
+            display:flex; align-items:center; gap:8px;
+            background:var(--sky-50); border:1px solid var(--sky-100);
+            border-radius:10px; padding:6px 14px;
+            cursor:pointer; font-size:0.82rem; font-weight:600; color:var(--sky-900);
+            transition:all 0.2s;">
+          <i class="bi bi-person-circle" style="font-size:1rem; color:var(--sky-600);"></i>
+          <%= user.username %>
+          <i class="bi bi-chevron-down" style="font-size:0.7rem; color:var(--muted);"></i>
+        </button>
+        <!-- Dropdown -->
+        <div id="userDropdown" style="
+            display:none; position:absolute; top:calc(100% + 8px); right:0;
+            background:var(--cloud); border:1px solid var(--sky-100); border-radius:12px;
+            box-shadow:0 8px 30px rgba(14,165,233,0.18); min-width:200px;
+            overflow:hidden; z-index:999; animation:fadeIn 0.15s ease;">
+          <div style="padding:14px 16px; border-bottom:1px solid var(--sky-50);">
+            <div style="font-size:0.7rem; color:var(--sky-300); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Login sebagai</div>
+            <div style="font-weight:700; color:var(--sky-900); font-size:0.9rem;">
+              <i class="bi bi-person-fill" style="color:var(--sky-600);"></i>
+              <%= user.username %>
+            </div>
+          </div>
+          <div style="padding:6px;">
+            <a href="/logout-confirm" style="
+                display:flex; align-items:center; gap:10px;
+                padding:9px 12px; border-radius:8px;
+                color:#c2185b; font-size:0.84rem; font-weight:600;
+                text-decoration:none; transition:background 0.15s;">
+              <i class="bi bi-box-arrow-right"></i> Keluar dari Akun
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -209,7 +292,7 @@
       </div>
       <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
-          <div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="stat-icon orange"><i class="bi bi-check-circle-fill"></i></div>
           <div class="stat-info">
             <h3 id="statSukses">-</h3>
             <p>Backup Sukses</p>
@@ -218,7 +301,7 @@
       </div>
       <div class="col-sm-6 col-xl-3">
         <div class="stat-card">
-          <div class="stat-icon orange"><i class="bi bi-layers-fill"></i></div>
+          <div class="stat-icon green"><i class="bi bi-layers-fill"></i></div>
           <div class="stat-info">
             <h3 id="statChannel">-</h3>
             <p>Channel Aktif</p>
@@ -240,7 +323,7 @@
     <div class="card-section">
       <div class="card-section-header">
         <h5><i class="bi bi-table me-2"></i>Daftar Backup</h5>
-        <span id="recordBadge" style="background:#e3f2fd;color:#1565c0;font-size:0.75rem;padding:5px 12px;border-radius:8px;font-weight:600;">
+        <span id="recordBadge" style="background:var(--sky-100);color:var(--sky-700);font-size:0.75rem;padding:5px 12px;border-radius:8px;font-weight:600;">
           - record
         </span>
       </div>
@@ -306,7 +389,7 @@
     let d = new Date(s);
     if (isNaN(d)) return s;
     return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
-      + ' <span style="color:#aab;font-size:0.8rem">'
+      + ' <span style="color:#9bb6cf;font-size:0.8rem">'
       + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
       + '</span>';
   }
@@ -373,9 +456,9 @@
       const ch = (x.channel || 'nodejs').toLowerCase();
       return `
         <tr class="${isNew ? 'new-row' : ''}">
-          <td><strong style="color:#6c7a8a">${i + 1}</strong></td>
-          <td><code style="background:#f0f4f8;padding:2px 7px;border-radius:4px;font-size:0.78rem;color:#1a3c5e">${x.id}</code></td>
-          <td><strong>${x.nama || '—'}</strong>${isNew ? ' <span style="background:#e8f5e9;color:#2e7d32;font-size:0.65rem;padding:2px 6px;border-radius:10px;font-weight:700;">BARU</span>' : ''}</td>
+          <td><strong style="color:#5b7896">${i + 1}</strong></td>
+          <td><code style="background:#f0f9ff;padding:2px 7px;border-radius:4px;font-size:0.78rem;color:#0c4a6e">${x.id}</code></td>
+          <td><strong>${x.nama || '—'}</strong>${isNew ? ' <span style="background:#fde68a;color:#92600a;font-size:0.65rem;padding:2px 6px;border-radius:10px;font-weight:700;">BARU</span>' : ''}</td>
           <td><span class="badge-channel badge-${ch}"><i class="bi bi-circle-fill" style="font-size:0.45rem;vertical-align:middle;"></i> ${ch.toUpperCase()}</span></td>
           <td>${fmtDate(x.waktu)}</td>
           <td><button class="btn-detail" onclick="lihatDetail('${x.id}', '${(x.nama||'').replace(/'/g,"\\'")}')"><i class="bi bi-eye"></i> Detail</button></td>
@@ -436,19 +519,19 @@
 
         const rows = data.map((t, i) => `
           <tr>
-            <td><span style="color:#aab">${i+1}</span></td>
-            <td><code style="background:#f0f4f8;padding:2px 6px;border-radius:4px;font-size:0.74rem">${t.id || '—'}</code></td>
-            <td style="font-size:0.8rem;color:#6c7a8a">${fmtDatePlain(t.tgl_jam)}</td>
+            <td><span style="color:#9bb6cf">${i+1}</span></td>
+            <td><code style="background:#f0f9ff;padding:2px 6px;border-radius:4px;font-size:0.74rem">${t.id || '—'}</code></td>
+            <td style="font-size:0.8rem;color:#5b7896">${fmtDatePlain(t.tgl_jam)}</td>
             <td>${t.uraian || '—'}</td>
             <td><span class="badge-jenis ${badgeJenis(t.jenis)}">${t.jenis === '+' ? 'Pemasukan' : t.jenis === '-' ? 'Pengeluaran' : t.jenis || '—'}</span></td>
-            <td style="text-align:right;font-weight:600;color:#1a3c5e">${fmt(t.nominal)}</td>
+            <td style="text-align:right;font-weight:600;color:#0c4a6e">${fmt(t.nominal)}</td>
           </tr>`).join('');
 
         document.getElementById('modalContent').innerHTML = `
           <div class="modal-stats">
             <div class="modal-stat-card"><div class="val">${data.length}</div><div class="lbl">Total Transaksi</div></div>
-            <div class="modal-stat-card"><div class="val" style="color:#2e7d32;font-size:1rem">${fmt(totalIncome)}</div><div class="lbl">Total Pemasukan</div></div>
-            <div class="modal-stat-card"><div class="val" style="color:#c62828;font-size:1rem">${fmt(totalExpense)}</div><div class="lbl">Total Pengeluaran</div></div>
+            <div class="modal-stat-card"><div class="val" style="color:#0d8f6e;font-size:1rem">${fmt(totalIncome)}</div><div class="lbl">Total Pemasukan</div></div>
+            <div class="modal-stat-card"><div class="val" style="color:#c2185b;font-size:1rem">${fmt(totalExpense)}</div><div class="lbl">Total Pengeluaran</div></div>
           </div>
           <div style="overflow-x:auto">
             <table class="table-backup">
@@ -473,6 +556,18 @@
 
   // ── INIT ─────────────────────────────────────────────────
   fetchData().then(() => startCountdown());
+
+  function toggleUserMenu() {
+    const dd = document.getElementById('userDropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  }
+  // Klik di luar dropdown → tutup
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('userMenuWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById('userDropdown').style.display = 'none';
+    }
+  });
 </script>
 </body>
 </html>
